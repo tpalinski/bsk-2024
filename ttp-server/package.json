@@ -1,0 +1,15 @@
+{
+  "name": "ttp-server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "build":"npx tailwindcss -i ./style/tailwind.css -o ./style/main.scss",
+    "watch":"npx tailwindcss -i ./style/tailwind.css -o ./style/main.scss --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "tailwindcss": "^3.4.1"
+  }
+}
