@@ -2,6 +2,8 @@ use leptos::*;
 use leptos_meta::*;
 use leptos_router::*;
 
+use crate::pages::generate_keys::GenerateKeys;
+
 #[component]
 pub fn App() -> impl IntoView {
     // Provides context that manages stylesheets, titles, meta tags, etc.
@@ -20,6 +22,7 @@ pub fn App() -> impl IntoView {
             <main>
                 <Routes>
                     <Route path="" view=HomePage/>
+                    <Route path="/generate" view=GenerateKeys/>
                     <Route path="/*any" view=NotFound/>
                 </Routes>
             </main>
