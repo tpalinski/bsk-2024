@@ -4,9 +4,8 @@ use rand::rngs::OsRng;
 use rsa::{pkcs1::EncodeRsaPublicKey, pkcs8::EncodePrivateKey, RsaPrivateKey, RsaPublicKey};
 use sha2::{Digest, Sha256};
 
-use self::model::UserKeys;
+use crate::model::user_keys::UserKeys;
 
-pub mod model;
 
 pub fn generate_keys(pin: &str) -> UserKeys{
     let (public_key, private_key) = generate_rsa_keys();

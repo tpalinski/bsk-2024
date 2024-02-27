@@ -7,6 +7,13 @@ async fn main() -> std::io::Result<()> {
     use leptos_actix::{generate_route_list, LeptosRoutes};
     use ttp_server::app::*;
 
+    // DB connection configuration
+    use ttp_server::user_repository::db;
+    let db_setup = db().await;
+    if db_setup.is_err() {
+        panic!("Error while connecting to db: connection couldn't be established");
+    }
+
     let conf = get_configuration(None).await.unwrap();
     let addr = conf.leptos_options.site_addr;
     // Generate the list of routes in your Leptos App
