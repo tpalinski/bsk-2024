@@ -1,13 +1,22 @@
 use leptos::*;
 
-use crate::crypto_server::{generate_keys, model::UserKeys};
+use crate::model::user_keys::UserKeys;
+
 
 #[server(GenerateUserKeys, "/api")]
 pub async fn generate_user_keys(pin: String) -> Result<UserKeys, ServerFnError> {
-    println!("geneating keys");
-    let keys = generate_keys(&pin);
-    println!("finished generating keys");
-    Ok(keys)
+    #[cfg(feature="ssr")]
+    {
+        use crate::crypto_server::generate_keys;
+        use crate::user_repository::insert_keys;
+        println!("geneating keys");
+        let keys = generate_keys(&pin);
+        println!("finished generating keys");
+        println!("Saving user keys...");
+        let _db_res = insert_keys("based@mail.com".to_owned(), &keys).await;
+        println!("Finished ssaving keys");
+        Ok(keys)
+    }
 }
 
 #[component]
