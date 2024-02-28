@@ -10,7 +10,11 @@ async fn pubkey(email: String) -> Result<String, ServerFnError> {
     match key {
         Ok(key) => Ok(key),
         Err(e) => match e {
-            crate::user_repository::DBError::NO_RECORD => Err(ServerFnError::ServerError("No user found".to_owned()))
+            crate::user_repository::DBError::NO_RECORD => {
+                let resp = expect_context::<leptos_actix::ResponseOptions>();
+                resp.set_status(actix_web::http::StatusCode::NOT_FOUND);
+                Err(ServerFnError::WrappedServerError(server_fn::error::NoCustomError))
+            }
         }
     }
 }
