@@ -44,7 +44,7 @@ pub fn GenerateKeys() -> impl IntoView {
 
     view! {
         <div class="flex flex-center items-center justify-center flex-col gap-1 text-center h-screen w-screen bg-gray-600">
-            <h1 class="text-violet-300 text-3xl"> Generate your encryption keys </h1>
+            <h1 class="text-violet-300 text-3xl fixed top-4"> Generate your encryption keys </h1>
             <Show
                 when=move || {!generate_action.pending().get()}
                 fallback=|| view! {"Generating keys. This process may take a while"}
@@ -56,7 +56,7 @@ pub fn GenerateKeys() -> impl IntoView {
                     }
                 prop:value=user_pin
                 />
-                <button class="pd-12 bg-violet-300 rounded-xl" on:click=on_click> Generate keys </button>
+                <button class="p-4 bg-violet-300 rounded-xl" on:click=on_click> Generate keys </button>
             </Show>
             <Show
                 when=move || {(!generate_action.pending().get()) && generate_action.version().get() > 0}
