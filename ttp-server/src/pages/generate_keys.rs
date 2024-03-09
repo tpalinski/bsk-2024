@@ -43,7 +43,7 @@ pub fn GenerateKeys() -> impl IntoView {
     });
 
     view! {
-        <div class="flex flex-center items-center justify-center flex-col gap-1 text-center">
+        <div class="flex flex-center items-center justify-center flex-col gap-1 text-center h-screen w-screen bg-gray-600">
             <h1 class="text-violet-300 text-3xl"> Generate your encryption keys </h1>
             <Show
                 when=move || {!generate_action.pending().get()}
