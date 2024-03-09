@@ -3,13 +3,17 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "build":"npx tailwindcss -i ./style/tailwind.css -o ./style/main.scss",
-    "watch":"npx tailwindcss -i ./style/tailwind.css -o ./style/main.scss --watch"
+    "build": "npx tailwindcss -i ./style/tailwind.css -o ./style/main.scss",
+    "watch": "npx tailwindcss -i ./style/tailwind.css -o ./style/main.scss --watch",
+    "dev": "concurrently --kill-others \"cargo leptos watch\" \"npm run watch\" \"surreal start --log trace file:users.db\""
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "tailwindcss": "^3.4.1"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
   }
 }
