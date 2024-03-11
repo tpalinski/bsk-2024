@@ -1,5 +1,11 @@
 pub mod app;
 
+#[cfg(feature = "ssr")]
+pub mod rsa;
+
+#[cfg(feature = "ssr")]
+pub mod keys;
+
 #[cfg(feature = "hydrate")]
 #[wasm_bindgen::prelude::wasm_bindgen]
 pub fn hydrate() {
