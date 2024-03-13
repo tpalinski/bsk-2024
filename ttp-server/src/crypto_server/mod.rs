@@ -30,9 +30,11 @@ fn encrypt_private_key(pin: &str, key: &RsaPrivateKey) -> String {
     let nonce = Aes256Gcm::generate_nonce(&mut OsRng);
     let key_as_bytes = key.to_pkcs8_pem(rsa::pkcs8::LineEnding::LF).unwrap();
     let key_as_bytes = key_as_bytes.as_bytes();
-    let encrypted_key = cipher.encrypt(&nonce, key_as_bytes).expect("Error while encrypting private key");
+    let mut encrypted_key = cipher.encrypt(&nonce, key_as_bytes).expect("Error while encrypting private key");
     println!("Private key encrypted successfully");
-    Base64::encode_string(&encrypted_key)
+    let mut nonce: Vec<u8> = nonce.into_iter().collect();
+    nonce.append(&mut encrypted_key);
+    Base64::encode_string(&nonce)
 }
 
 fn generate_aes_key(pin: &str) -> Key<Aes256Gcm> {
