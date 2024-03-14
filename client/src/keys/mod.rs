@@ -1,4 +1,4 @@
-use rsa::{pkcs8::DecodePrivateKey, RsaPrivateKey};
+use rsa::{pkcs1::DecodeRsaPublicKey, pkcs8::DecodePrivateKey, RsaPrivateKey, RsaPublicKey};
 
 mod aes;
 
@@ -15,4 +15,9 @@ pub fn get_private_key() -> RsaPrivateKey {
     let key_string = aes::decrypt_key(PRIVATE_KEY.to_owned(), USER_PIN.to_owned());
     let key = RsaPrivateKey::from_pkcs8_pem(&key_string).expect("Error while parsing private key");
     key
+}
+
+pub fn get_public_key() -> RsaPublicKey {
+    let key_string = RsaPublicKey::from_pkcs1_pem(PUBLIC_KEY).expect("Error while parsing public key");
+    key_string
 }
