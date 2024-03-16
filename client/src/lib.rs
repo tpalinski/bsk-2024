@@ -6,6 +6,10 @@ pub mod rsa;
 #[cfg(feature = "ssr")]
 pub mod keys;
 
+
+#[cfg(feature = "ssr")]
+pub mod filesystem;
+
 #[cfg(feature = "hydrate")]
 #[wasm_bindgen::prelude::wasm_bindgen]
 pub fn hydrate() {
