@@ -1,4 +1,5 @@
 pub mod app;
+pub mod pages;
 
 #[cfg(feature = "ssr")]
 pub mod rsa;

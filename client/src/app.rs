@@ -1,6 +1,8 @@
-use leptos::*;
+use leptos::{leptos_dom::logging::console_log, *};
 use leptos_meta::*;
 use leptos_router::*;
+
+use crate::pages::signature::SignaturePage;
 
 #[component]
 pub fn App() -> impl IntoView {
@@ -13,13 +15,14 @@ pub fn App() -> impl IntoView {
         <Stylesheet id="leptos" href="/pkg/client.css"/>
 
         // sets the document title
-        <Title text="Welcome to Leptos"/>
+        <Title text="RSA encryption"/>
 
         // content for this welcome page
         <Router>
             <main>
                 <Routes>
                     <Route path="" view=HomePage/>
+                    <Route path="/signature" view=SignaturePage/>
                     <Route path="/*any" view=NotFound/>
                 </Routes>
             </main>
@@ -30,10 +33,13 @@ pub fn App() -> impl IntoView {
 /// Renders the home page of your application.
 #[component]
 fn HomePage() -> impl IntoView {
-    // Creates a reactive value to update the button
 
     view! {
-        <h1 class="text-center text-3xl">"Professional RSA encryption app"</h1>
+        <div class="bg-gray-600 h-screen w-screen flex flex-col gap-4 items-center">
+            <h1 class="text-violet-300 text-6xl">"Professional RSA encryption app"</h1>
+            <p class="bold text-xl text-center"> Choose one of the options below </p>
+            <a href="/signature" class="p-4 bg-violet-300 rounded-xl"> Sign a document utilizing electronic signature </a>
+        </div>
     }
 }
 
