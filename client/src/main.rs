@@ -10,19 +10,20 @@ async fn main() -> std::io::Result<()> {
     use client::app::*;
 
     // Test basic functionalities
-    use client::filesystem::get_file_contents;
+    use client::filesystem::{get_file_contents, save_to_file};
     use client::rsa::{sign_data, verify_signature};
 
-    let mut path = PathBuf::new();
-    path.push("test_file.txt");
+    let path = PathBuf::from("test_file.txt");
 
     let data = get_file_contents(path);
     let signature = sign_data(data.clone());
-    match verify_signature(data, dbg!(signature)) {
+    match verify_signature(data, dbg!(signature.clone())) {
         Ok(()) => println!("signature matches"),
         Err(_) => println!("invalid_signature")
         
     }
+    let outfile = PathBuf::from("outfile.txt");
+    save_to_file(signature.into_bytes(), outfile);
 
     let conf = get_configuration(None).await.unwrap();
     let addr = conf.leptos_options.site_addr;
