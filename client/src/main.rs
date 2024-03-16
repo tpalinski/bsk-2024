@@ -1,11 +1,28 @@
 #[cfg(feature = "ssr")]
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    use std::path::PathBuf;
+
     use actix_files::Files;
     use actix_web::*;
     use leptos::*;
     use leptos_actix::{generate_route_list, LeptosRoutes};
     use client::app::*;
+
+    // Test basic functionalities
+    use client::filesystem::get_file_contents;
+    use client::rsa::{sign_data, verify_signature};
+
+    let mut path = PathBuf::new();
+    path.push("test_file.txt");
+
+    let data = get_file_contents(path);
+    let signature = sign_data(data.clone());
+    match verify_signature(data, dbg!(signature)) {
+        Ok(()) => println!("signature matches"),
+        Err(_) => println!("invalid_signature")
+        
+    }
 
     let conf = get_configuration(None).await.unwrap();
     let addr = conf.leptos_options.site_addr;
