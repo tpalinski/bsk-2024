@@ -1,13 +1,28 @@
 use leptos::*;
 use leptos_meta::*;
 use leptos_router::*;
+use serde::{Deserialize, Serialize};
 
-use crate::pages::{generate_keys::GenerateKeys, home_page::HomePage};
+use crate::pages::{generate_keys::GenerateKeys, home_page::HomePage, register::RegistrationPage};
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct GlobalState {
+    pub email: String,
+    pub token: String
+}
+
+impl GlobalState {
+    pub fn new() -> Self {
+        GlobalState { email: String::new(), token: String::new() }
+    }
+}
+
 
 #[component]
 pub fn App() -> impl IntoView {
     // Provides context that manages stylesheets, titles, meta tags, etc.
     provide_meta_context();
+    provide_context(create_rw_signal(GlobalState::new()));
 
     view! {
         // injects a stylesheet into the document <head>
@@ -15,7 +30,7 @@ pub fn App() -> impl IntoView {
         <Stylesheet id="leptos" href="/pkg/ttp-server.css"/>
 
         // sets the document title
-        <Title text="Welcome to Leptos"/>
+        <Title text="TTP server"/>
 
         // content for this welcome page
         <Router>
@@ -23,6 +38,7 @@ pub fn App() -> impl IntoView {
                 <Routes>
                     <Route path="" view=HomePage/>
                     <Route path="/generate" view=GenerateKeys/>
+                    <Route path="/register" view=RegistrationPage/>
                     <Route path="/*any" view=NotFound/>
                 </Routes>
             </main>
