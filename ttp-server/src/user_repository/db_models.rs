@@ -29,13 +29,14 @@ impl UserKeyData {
 // User login data
 #[derive(Serialize, Debug, Deserialize)]
 pub struct User {
-    password: String,
-    token: String,
+    pub password: String,
+    pub token: String,
+    pub name: String
 }
 
 
 impl User {
-    pub fn new(password: String, token: String) -> Self {
-        User{password, token}
+    pub fn new(password: String, token: String, name: String) -> Self {
+        User{password, token, name}
     }
 }

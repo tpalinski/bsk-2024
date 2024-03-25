@@ -1,10 +1,10 @@
 use once_cell::sync::Lazy;
 use serde::Deserialize;
-use surrealdb::{engine::remote::ws::{Client, Ws}, sql::Thing, Surreal};
+use surrealdb::{engine::remote::ws::{Client, Ws}, opt::PatchOp, sql::Thing, Surreal};
 
 use crate::model::user_keys::UserKeys;
 
-use self::db_models::{User, UserKeyData};
+use self::{db_models::{User, UserKeyData}, utils::generate_token};
 
 static DB: Lazy<Surreal<Client>> = Lazy::new(Surreal::init);
 
@@ -48,11 +48,27 @@ pub async fn user_exists(email: String) -> Result<bool, DBError> {
 }
 
 pub async fn create_user(user: User, email: String) -> surrealdb::Result<()> {
-    let _: Vec<Record> = DB.create(("user", &email))
+    let _: Record = DB.create(("user", &email))
         .content(user)
         .await?
         .expect("DB error");
     Ok(())
+}
+
+pub async fn validate_token(email: String, token: String) -> Result<bool, DBError> {
+    let user: Option<User> = DB.select(("user", &email)).await.expect("DBconnection Error");
+    match user {
+        Some(user) => Ok(user.token == token),
+        None => Err(DBError::NO_RECORD)
+    }
+}
+
+pub async fn replace_token(email: String) -> surrealdb::Result<String> {
+    let token = generate_token(email.clone());
+    let _: Option<User> = DB.update(("user", &email))
+        .patch(PatchOp::replace("/token", &token))
+        .await?;
+    Ok(token)
 }
 
 pub async fn get_public_key(email: String) -> Result<String, DBError> {
