@@ -2,6 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::model::user_keys::UserKeys;
 
+// Information about user keys
 #[derive(Serialize, Debug, Deserialize)]
 pub struct UserKeyData {
     private_key: String,
@@ -22,5 +23,19 @@ impl UserKeyData {
 
     pub fn pubkey(&self) -> String {
         self.public_key.to_owned()
+    }
+}
+
+// User login data
+#[derive(Serialize, Debug, Deserialize)]
+pub struct User {
+    password: String,
+    token: String,
+}
+
+
+impl User {
+    pub fn new(password: String, token: String) -> Self {
+        User{password, token}
     }
 }
