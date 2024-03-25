@@ -1,20 +1,20 @@
-use std::any::Any;
-
 use once_cell::sync::Lazy;
 use serde::Deserialize;
 use surrealdb::{engine::remote::ws::{Client, Ws}, sql::Thing, Surreal};
 
 use crate::model::user_keys::UserKeys;
 
-use self::db_models::UserKeyData;
+use self::db_models::{User, UserKeyData};
 
 static DB: Lazy<Surreal<Client>> = Lazy::new(Surreal::init);
 
 pub mod db_models;
+pub mod utils;
 
 #[derive(Debug, Clone)]
 pub enum DBError {
-    NO_RECORD
+    NO_RECORD,
+    USER_EXISTS,
 }
 
 #[derive(Debug, Deserialize)]
@@ -35,15 +35,28 @@ pub async fn db() -> surrealdb::Result<()> {
 
 pub async fn insert_keys(email: String, keys: &UserKeys) -> surrealdb::Result<()> {
     let record_data: UserKeyData = keys.to_owned().into(); 
-    let _created: Vec<Record> = DB.create(("user", &email))
+    let _created: Vec<Record> = DB.create(("keys", &email))
         .content(record_data)
         .await?
         .expect("DB error");
     Ok(())
 }
 
+pub async fn user_exists(email: String) -> Result<bool, DBError> {
+    let user: Option<User> = DB.select(("user", &email)).await.expect("DBconnection Error");
+    Ok(user.is_some())
+}
+
+pub async fn create_user(user: User, email: String) -> surrealdb::Result<()> {
+    let _: Vec<Record> = DB.create(("user", &email))
+        .content(user)
+        .await?
+        .expect("DB error");
+    Ok(())
+}
+
 pub async fn get_public_key(email: String) -> Result<String, DBError> {
-    let user: Option<UserKeyData> = DB.select(("user", &email)).await.expect("DBconnection Error");
+    let user: Option<UserKeyData> = DB.select(("keys", &email)).await.expect("DBconnection Error");
     match user {
         Some(res) => Ok(res.pubkey()),
         None => Err(DBError::NO_RECORD)
