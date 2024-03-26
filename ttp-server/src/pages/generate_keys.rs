@@ -7,20 +7,10 @@ pub async fn generate_user_keys(pin: String, email: String, token: String) -> Re
     #[cfg(feature="ssr")]
     {
         use crate::crypto_server::generate_keys;
-        use crate::user_repository::{validate_token, insert_keys, replace_token};
+        use crate::user_repository::{insert_keys, replace_token};
+        use crate::api_utils::validate_user_token;
 
-        match validate_token(email.clone(), token.clone()).await {
-            Ok(res) => {
-                if !res {
-                    let resp = expect_context::<leptos_actix::ResponseOptions>();
-                    resp.set_status(actix_web::http::StatusCode::FORBIDDEN);
-                    return Err(ServerFnError::ServerError("Error while authenticating user. Are you sure you are logged in?".to_owned()))
-                }
-            },
-            Err(_) => {
-                return Err(ServerFnError::ServerError("Tokens do not match".to_owned()))
-            }
-        };
+        let _ = validate_user_token(token, email.clone()).await?;
         let keys = generate_keys(&pin);
         let _db_res = insert_keys(email.clone(), &keys).await;
         let new_token = match replace_token(email).await {

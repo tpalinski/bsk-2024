@@ -1,6 +1,7 @@
 use std::{collections::BTreeMap, time::Instant};
 
-use sha2::Sha256;
+use base64ct::{Base64, Encoding};
+use sha2::{Digest, Sha256};
 use jwt::SignWithKey;
 use hmac::{Hmac, Mac};
 
@@ -16,3 +17,8 @@ pub fn generate_token(email: String) -> String {
     token_str
 }
 
+pub fn check_passwords(plain: String, hashed: String) -> bool{
+    let hash = Sha256::digest(plain);
+    let stringified_hash = Base64::encode_string(&hash);
+    stringified_hash == hashed
+}
