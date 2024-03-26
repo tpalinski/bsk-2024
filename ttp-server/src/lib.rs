@@ -8,6 +8,9 @@ pub mod crypto_server;
 pub mod user_repository;
 #[cfg(feature = "ssr")]
 pub mod key_api;
+#[cfg(feature = "ssr")]
+pub mod api_utils;
+
 
 #[cfg(feature = "hydrate")]
 #[wasm_bindgen::prelude::wasm_bindgen]

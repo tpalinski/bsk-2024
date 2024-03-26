@@ -1,7 +1,7 @@
 use leptos::{server_fn::codec::Json, *};
 use serde::{Deserialize, Serialize};
 
-use crate::user_repository::{get_private_key, get_public_key, replace_token, validate_token};
+use crate::{api_utils::validate_user_token, user_repository::{get_private_key, get_public_key, replace_token}};
 
 #[server(name=GetPublicKeyRequest, prefix="/api", endpoint="pubkey", input = Json, output = Json)]
 async fn pubkey(email: String) -> Result<String, ServerFnError> {
@@ -26,18 +26,7 @@ pub struct GetPrivateKeyResponse {
 
 #[server(name=GetPrivateKeyRequest, prefix="/api", endpoint="privkey", input = Json, output = Json)]
 async fn privkey(email: String, token: String) -> Result<GetPrivateKeyResponse, ServerFnError> {
-    match validate_token(email.clone(), token.clone()).await {
-        Ok(res) => {
-            if !res {
-                let resp = expect_context::<leptos_actix::ResponseOptions>();
-                resp.set_status(actix_web::http::StatusCode::FORBIDDEN);
-                return Err(ServerFnError::ServerError("Error while authenticating user. Are you sure you are logged in?".to_owned()))
-            }
-        },
-        Err(_) => {
-            return Err(ServerFnError::ServerError("Tokens do not match".to_owned()))
-        }
-    };
+    let _ = validate_user_token(token, email.clone()).await?;
     let key = match get_private_key(email.clone()).await {
         Ok(key) => key,
         Err(e) => match e {

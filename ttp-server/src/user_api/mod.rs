@@ -1,6 +1,8 @@
 use leptos::{server_fn::codec::Json, *};
 use serde::{Deserialize, Serialize};
 
+
+
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct TokenResponse {
     pub token: String
@@ -18,18 +20,11 @@ pub async fn register_user(email: String, password: String, user_name: String) -
     {
         use base64ct::{Base64, Encoding};
         use sha2::{Digest, Sha256};
+        use crate::api_utils::check_user;
+        use crate::user_repository::{create_user, db_models::User, utils::generate_token};
 
-        use crate::user_repository::{create_user, db_models::User, user_exists, utils::generate_token};
 
-
-        let user_exists = match user_exists(email.clone()).await {
-            Ok(r) => r,
-            Err(_) => {
-                let resp = expect_context::<leptos_actix::ResponseOptions>();
-                resp.set_status(actix_web::http::StatusCode::INTERNAL_SERVER_ERROR);
-                return Err(ServerFnError::ServerError("Error while checking DB".to_owned()))
-            }
-        };
+        let user_exists = check_user(email.clone()).await?;
         if user_exists {
             let resp = expect_context::<leptos_actix::ResponseOptions>();
             resp.set_status(actix_web::http::StatusCode::CONFLICT);
@@ -47,5 +42,37 @@ pub async fn register_user(email: String, password: String, user_name: String) -
                 Err(ServerFnError::ServerError("Error while creating user".to_owned()))
             }
         }
+    }
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct UserInfoResponse {
+    pub email: String,
+    pub token: String,
+    pub name: String
+}
+
+#[server(name=LoginUserRequest, prefix="/api/user", endpoint="login", input = Json, output = Json)]
+pub async fn login_user(email: String, password: String) -> Result<UserInfoResponse, ServerFnError> {
+    #[cfg(feature="ssr")]
+    {
+        use crate::api_utils::check_user;
+        use crate::user_repository::replace_token;
+        use crate::user_repository::{get_user, utils::check_passwords};
+
+        let user_exists = check_user(email.clone()).await?;
+        if !user_exists {
+            let resp = expect_context::<leptos_actix::ResponseOptions>();
+            resp.set_status(actix_web::http::StatusCode::NOT_FOUND);
+            return Err(ServerFnError::ServerError("User does not exist".to_owned()))
+        }
+        let user = get_user(email.clone()).await?.unwrap(); // This should never throw, if id does just 500 it
+        if !check_passwords(password, user.password) {
+            let resp = expect_context::<leptos_actix::ResponseOptions>();
+            resp.set_status(actix_web::http::StatusCode::UNAUTHORIZED);
+            return Err(ServerFnError::ServerError("Wrong password provided".to_owned()))
+        }
+        let token = replace_token(email.clone()).await?;
+        Ok(UserInfoResponse{token, email, name: user.name})
     }
 }

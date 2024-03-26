@@ -55,6 +55,11 @@ pub async fn create_user(user: User, email: String) -> surrealdb::Result<()> {
     Ok(())
 }
 
+pub async fn get_user(email: String) -> surrealdb::Result<Option<User>> {
+    let user = DB.select(("user", email)).await;
+    user
+}
+
 pub async fn validate_token(email: String, token: String) -> Result<bool, DBError> {
     let user: Option<User> = DB.select(("user", &email)).await.expect("DBconnection Error");
     match user {
