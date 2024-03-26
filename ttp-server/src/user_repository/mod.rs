@@ -74,7 +74,15 @@ pub async fn replace_token(email: String) -> surrealdb::Result<String> {
 pub async fn get_public_key(email: String) -> Result<String, DBError> {
     let user: Option<UserKeyData> = DB.select(("keys", &email)).await.expect("DBconnection Error");
     match user {
-        Some(res) => Ok(res.pubkey()),
+        Some(res) => Ok(res.public_key),
+        None => Err(DBError::NO_RECORD)
+    }
+}
+
+pub async fn get_private_key(email: String) -> Result<String, DBError> {
+    let user: Option<UserKeyData> = DB.select(("keys", &email)).await.expect("DBconnection Error");
+    match user {
+        Some(res) => Ok(res.private_key),
         None => Err(DBError::NO_RECORD)
     }
 }
