@@ -1,5 +1,7 @@
 pub mod app;
 pub mod pages;
+pub mod model;
+pub mod http_client;
 
 #[cfg(feature = "ssr")]
 pub mod rsa;
