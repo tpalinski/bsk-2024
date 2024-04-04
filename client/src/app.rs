@@ -1,13 +1,29 @@
-use leptos::{leptos_dom::logging::console_log, *};
+use leptos::*;
 use leptos_meta::*;
 use leptos_router::*;
+use serde::{Deserialize, Serialize};
 
-use crate::pages::signature::SignaturePage;
+use crate::pages::{home::HomePage, login::LoginPage, signature::SignaturePage};
+
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct GlobalState {
+    pub email: String,
+    pub token: String,
+    pub name: String
+}
+
+impl GlobalState {
+    pub fn new() -> Self {
+        GlobalState { email: String::new(), token: String::new(), name: String::new() }
+    }
+}
 
 #[component]
 pub fn App() -> impl IntoView {
     // Provides context that manages stylesheets, titles, meta tags, etc.
     provide_meta_context();
+    provide_context(create_rw_signal(GlobalState::new()));
 
     view! {
         // injects a stylesheet into the document <head>
@@ -22,6 +38,7 @@ pub fn App() -> impl IntoView {
             <main>
                 <Routes>
                     <Route path="" view=HomePage/>
+                    <Route path="/login" view=LoginPage/>
                     <Route path="/signature" view=SignaturePage/>
                     <Route path="/*any" view=NotFound/>
                 </Routes>
@@ -31,17 +48,6 @@ pub fn App() -> impl IntoView {
 }
 
 /// Renders the home page of your application.
-#[component]
-fn HomePage() -> impl IntoView {
-
-    view! {
-        <div class="bg-gray-600 h-screen w-screen flex flex-col gap-4 items-center">
-            <h1 class="text-violet-300 text-6xl">"Professional RSA encryption app"</h1>
-            <p class="bold text-xl text-center"> Choose one of the options below </p>
-            <a href="/signature" class="p-4 bg-violet-300 rounded-xl"> Sign a document utilizing electronic signature </a>
-        </div>
-    }
-}
 
 /// 404 - Not Found
 #[component]
