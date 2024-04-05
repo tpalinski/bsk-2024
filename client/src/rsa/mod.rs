@@ -2,6 +2,7 @@ use crate::keys::{get_private_key, get_public_key};
 
 mod encryption;
 mod decryption;
+pub mod model;
 
 pub fn sign_data(data: Vec<u8>) -> String {
     let key = get_private_key();

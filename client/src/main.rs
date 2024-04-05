@@ -1,13 +1,15 @@
 #[cfg(feature = "ssr")]
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    use std::path::PathBuf;
 
     use actix_files::Files;
     use actix_web::*;
     use leptos::*;
     use leptos_actix::{generate_route_list, LeptosRoutes};
-    use client::app::*;
+    use client::{app::*, rsa::model::Signature};
+
+    let test_s = Signature::new();
+    dbg!(quick_xml::se::to_string(&test_s));
 
     let conf = get_configuration(None).await.unwrap();
     let addr = conf.leptos_options.site_addr;
