@@ -3,11 +3,16 @@ use serde::{Deserialize, Serialize};
 
 use crate::{api_utils::validate_user_token, user_repository::{get_private_key, get_public_key, replace_token}};
 
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct GetPublicKeyResponse {
+    pub key: String, 
+}
+
 #[server(name=GetPublicKeyRequest, prefix="/api", endpoint="pubkey", input = Json, output = Json)]
-async fn pubkey(email: String) -> Result<String, ServerFnError> {
+async fn pubkey(email: String) -> Result<GetPublicKeyResponse, ServerFnError> {
     let key = get_public_key(email).await;
     match key {
-        Ok(key) => Ok(key),
+        Ok(key) => Ok(GetPublicKeyResponse { key }),
         Err(e) => match e {
             _ => {
                 let resp = expect_context::<leptos_actix::ResponseOptions>();

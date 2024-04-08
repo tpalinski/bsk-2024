@@ -27,6 +27,16 @@ pub struct PrivkeyResponse {
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct PubkeyResponse {
+    pub key: String,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct TokenResponse {
     pub token: String
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct EmailRequest {
+    pub email: String
 }
