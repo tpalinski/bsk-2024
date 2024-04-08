@@ -6,14 +6,11 @@ use crate::app::GlobalState;
 async fn sign_file(path: String, token: String, name: String, pin: String) -> Result<String, ServerFnError> {
     #[cfg(feature="ssr")]
     {
-        use crate::filesystem::{get_file_contents, save_to_file};
+        use crate::filesystem::{get_data_from_fake_path, save_to_fake_path};
         use crate::rsa::sign_data;
 
         // TODO - move it to some top level fn
-        let mut file_name = path.rsplit('\\').collect::<Vec<&str>>()[0].to_owned();
-        let mut path = dirs::home_dir().unwrap();
-        path.push(&file_name);
-        let data = get_file_contents(dbg!(path.clone()));
+        let data = get_data_from_fake_path(path.clone());
         let (signature, new_token) = match sign_data(&data, name, token, pin).await {
             Ok(s) => s,
             Err(e) => {
@@ -22,10 +19,7 @@ async fn sign_file(path: String, token: String, name: String, pin: String) -> Re
                 return Err(ServerFnError::ServerError(e))
             }
         };
-        file_name.push_str(".xades");
-        let mut path = dirs::home_dir().unwrap();
-        path.push(&file_name);
-        save_to_file(signature.into_bytes(), path);
+        save_to_fake_path(signature.into_bytes(), path);
         Ok(new_token)
     }
 }
@@ -81,6 +75,7 @@ pub fn SignaturePage() -> impl IntoView {
     view! {
         <div class="bg-gray-600 h-screen w-screen flex flex-col gap-4 items-center">
             <h1 class="text-violet-300 text-6xl">"Professional RSA encryption app"</h1>
+            <a href="/" class="p-4 bg-violet-300 rounded-xl"> Homepage </a>
             <p class="bold text-xl text-center"> Welcome {global_state.get().name}. Please choose the file you want to sign</p>
             <label>
                 "Pick a file"
