@@ -4,23 +4,22 @@ use leptos::*;
 async fn verify_file(path: String) -> Result<String, ServerFnError> {
     #[cfg(feature="ssr")]
     {
-        use crate::filesystem::get_file_contents;
-        use std::path::PathBuf;
-        use crate::rsa::model::Signature;
+        use crate::{filesystem::get_verify_data, rsa::verify_signature};
 
         // load files
-        let file_name = path.rsplit('\\').collect::<Vec<&str>>()[0].to_owned();
-        let mut path = dirs::home_dir().unwrap();
-        path.push(&file_name);
-        let data_file_name = path.file_stem().unwrap();
-        let xades_data = get_file_contents(path.clone());
-        let mut data_path = dirs::home_dir().unwrap();
-        data_path.push(data_file_name);
-        let _file_data = get_file_contents(dbg!(PathBuf::from(data_path)));
+        let (xades_data, file_data) = get_verify_data(path);
+        match verify_signature(&file_data, xades_data).await {
+            Ok(res) => {
+                if res {Ok("Signature is valid".to_owned())}
+                else {Ok("Signature validation failed - not genuine!!!".to_owned())}
+            },
+            Err(e) => {
+                let resp = expect_context::<leptos_actix::ResponseOptions>();
+                resp.set_status(actix_web::http::StatusCode::INTERNAL_SERVER_ERROR);
+                return Err(ServerFnError::ServerError(e))
+            }
+        }
 
-        //Verify
-        let xades = dbg!(Signature::from_xml(xades_data));
-        Ok("Good".to_owned())
     }
 }
 
@@ -57,6 +56,7 @@ pub fn VerifyPage() -> impl IntoView {
     view! {
         <div class="bg-gray-600 h-screen w-screen flex flex-col gap-4 items-center">
             <h1 class="text-violet-300 text-6xl">"Professional RSA encryption app"</h1>
+            <a href="/" class="p-4 bg-violet-300 rounded-xl"> Homepage </a>
             <p class="bold text-xl text-center"> Verify signature</p>
             <label>
                 "Signature file"
@@ -68,7 +68,7 @@ pub fn VerifyPage() -> impl IntoView {
                 let path = input_ref().expect("should never happen").value();
                 verify_action.dispatch(VerifyFile {path});
             }>
-            Sign file
+            Verify
             </button>
             <Show 
                 when=move || {verify_error.get().is_some()}
@@ -80,7 +80,7 @@ pub fn VerifyPage() -> impl IntoView {
                 when=move || {verify_data.get().is_some()}
                 fallback=|| view! {}
             >
-                    {verify_data.get().unwrap()}
+                    <p class="text-violet-300 text 4-xl"> {verify_data.get().unwrap()} </p>
             </Show>
         </div>
     }

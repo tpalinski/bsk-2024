@@ -59,6 +59,7 @@ pub fn LoginPage() -> impl IntoView {
     view! {
         <div class="bg-gray-600 h-screen w-screen flex flex-col gap-4 items-center">
             <h1 class="text-violet-300 text-6xl">"Professional RSA encryption app - login page"</h1>
+            <a href="/" class="p-4 bg-violet-300 rounded-xl"> Homepage </a>
             <p class="bold text-xl text-center"> Please log in to access desired functionality</p>
             <label>
                 "Email"
