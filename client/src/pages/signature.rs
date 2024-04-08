@@ -84,13 +84,13 @@ pub fn SignaturePage() -> impl IntoView {
             <p class="bold text-xl text-center"> Welcome {global_state.get().name}. Please choose the file you want to sign</p>
             <label>
                 "Pick a file"
-                <input type="file" 
+                <input type="file" accept=".txt,.pdf"
                     node_ref=input_ref
                 />
             </label>
             <label>
                 "Enter your user pin"
-                <input type="text" name="text"
+                <input type="text" name="text" 
                     on:input=move |ev| {
                         set_pin(event_target_value(&ev));
                     }
