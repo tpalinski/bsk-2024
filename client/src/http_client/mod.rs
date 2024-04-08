@@ -2,7 +2,7 @@ use std::sync::OnceLock;
 
 use reqwest::{Client, StatusCode};
 
-use crate::model::{LoginRequest, LoginResponse, PrivkeyRequest, PrivkeyResponse};
+use crate::model::{EmailRequest, LoginRequest, LoginResponse, PrivkeyRequest, PrivkeyResponse, PubkeyResponse};
 
 const BASE_URL: &str = "http://localhost:3000/api";
 
@@ -40,4 +40,19 @@ pub async fn privkey(email: String, token: String) -> Result<PrivkeyResponse, St
         Err(res.status())
     }
 
+}
+
+pub async fn pubkey(email: String) -> Result<PubkeyResponse, StatusCode> {
+    let body = EmailRequest{email};
+    let client = http_client();
+    let res = client.post(BASE_URL.to_owned() + "/pubkey")
+        .json(&body)
+        .send()
+        .await
+        .expect("Error while sending pubkey request");
+    if res.status() == 200 {
+        Ok(res.json::<PubkeyResponse>().await.unwrap())
+    } else {
+        Err(res.status())
+    }
 }
