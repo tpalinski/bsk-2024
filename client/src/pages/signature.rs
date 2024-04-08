@@ -6,13 +6,13 @@ use crate::app::GlobalState;
 async fn sign_file(path: String, token: String, name: String, pin: String) -> Result<String, ServerFnError> {
     #[cfg(feature="ssr")]
     {
-        use std::path::PathBuf;
         use crate::filesystem::{get_file_contents, save_to_file};
         use crate::rsa::sign_data;
 
         // TODO - move it to some top level fn
         let mut file_name = path.rsplit('\\').collect::<Vec<&str>>()[0].to_owned();
-        let path = PathBuf::from(file_name.clone());
+        let mut path = dirs::home_dir().unwrap();
+        path.push(&file_name);
         let data = get_file_contents(dbg!(path.clone()));
         let (signature, new_token) = match sign_data(&data, name, token, pin).await {
             Ok(s) => s,
@@ -23,7 +23,8 @@ async fn sign_file(path: String, token: String, name: String, pin: String) -> Re
             }
         };
         file_name.push_str(".xades");
-        let path = PathBuf::from(file_name);
+        let mut path = dirs::home_dir().unwrap();
+        path.push(&file_name);
         save_to_file(signature.into_bytes(), path);
         Ok(new_token)
     }
