@@ -14,6 +14,19 @@ pub struct LoginResponse {
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct PrivkeyRequest {
+    pub email: String,
+    pub token: String,
+}
+
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct PrivkeyResponse {
+    pub key: String,
+    pub token: String,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct TokenResponse {
     pub token: String
 }

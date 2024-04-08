@@ -2,7 +2,7 @@ use std::sync::OnceLock;
 
 use reqwest::{Client, StatusCode};
 
-use crate::model::{LoginRequest, LoginResponse};
+use crate::model::{LoginRequest, LoginResponse, PrivkeyRequest, PrivkeyResponse};
 
 const BASE_URL: &str = "http://localhost:3000/api";
 
@@ -24,4 +24,20 @@ pub async fn login(email: String, password: String) -> Result<LoginResponse, Sta
     } else {
         Err(res.status())
     }
+}
+
+pub async fn privkey(email: String, token: String) -> Result<PrivkeyResponse, StatusCode> {
+    let body = PrivkeyRequest{email, token};
+    let client = http_client();
+    let res = client.post(BASE_URL.to_owned() + "/privkey")
+        .json(&body)
+        .send()
+        .await
+        .expect("Error while sending privkey request");
+    if res.status() == 200 {
+        Ok(res.json::<PrivkeyResponse>().await.unwrap())
+    } else {
+        Err(res.status())
+    }
+
 }
