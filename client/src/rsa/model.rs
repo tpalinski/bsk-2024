@@ -3,7 +3,9 @@ use std::error::Error;
 use rsa::RsaPrivateKey;
 use strong_xml::{XmlRead, XmlWrite};
 
-use super::{encryption, utils::get_hash};
+use crate::keys::get_public_key;
+
+use super::{decryption::verify_signature, encryption, utils::get_hash};
 
 #[derive(XmlWrite, XmlRead, Clone, Debug)]
 #[xml(tag="ds:Signature")]
@@ -86,11 +88,28 @@ impl Signature {
         self.to_string().unwrap()
     }
 
-    pub fn from_xml(data: Vec<u8>) -> Result<Self, Box<dyn Error>> {
-        let xml_string = String::from_utf8(data)?;
+    pub fn from_xml(data: Vec<u8>) -> Result<Self, String> {
+        let xml_string = match String::from_utf8(data) {
+            Ok(s) => s,
+            Err(e) => return Err(format!("{e}"))
+        };
         match Signature::from_str(&xml_string) {
             Ok(xades) => Ok(xades),
             Err(e) => Err(format!("{e}").into())
+        }
+    }
+
+    pub async fn verify(&self, claim: &[u8]) -> Result<bool, String> {
+        let claim_hash = get_hash(claim);
+        if claim_hash != self.info.rf.dv.text {
+            return Ok(false);
+        }
+        let author = self.obj.qp.sp.ssp.cert.text.clone();
+        let pubkey = get_public_key(author).await?;
+        let signature = self.sig.text.clone();
+        match verify_signature(claim, pubkey, signature) {
+            Ok(_) => Ok(true),
+            Err(_) => Ok(false)
         }
     }
 }
