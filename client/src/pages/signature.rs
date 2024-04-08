@@ -14,8 +14,8 @@ async fn sign_file(path: String) -> Result<(), ServerFnError> {
         let mut file_name = path.rsplit('\\').collect::<Vec<&str>>()[0].to_owned();
         let path = PathBuf::from(file_name.clone());
         let data = get_file_contents(dbg!(path.clone()));
-        let signature = sign_data(data);
-        file_name.push_str(".sign");
+        let signature = sign_data(&data, "Author's name".to_owned(), "sample_token".to_owned()).await.unwrap();
+        file_name.push_str(".xades");
         let path = PathBuf::from(file_name);
         save_to_file(signature.into_bytes(), path);
     }

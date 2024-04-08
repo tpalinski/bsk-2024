@@ -6,10 +6,7 @@ async fn main() -> std::io::Result<()> {
     use actix_web::*;
     use leptos::*;
     use leptos_actix::{generate_route_list, LeptosRoutes};
-    use client::{app::*, rsa::model::Signature};
-
-    let test_s = Signature::new();
-    dbg!(quick_xml::se::to_string(&test_s));
+    use client::app::*;
 
     let conf = get_configuration(None).await.unwrap();
     let addr = conf.leptos_options.site_addr;

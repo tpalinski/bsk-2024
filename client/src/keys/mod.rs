@@ -11,10 +11,10 @@ pub fn get_keys() -> String {
     aes::decrypt_key(PRIVATE_KEY.to_owned(), USER_PIN.to_owned())
 }
 
-pub fn get_private_key() -> RsaPrivateKey {
+pub async fn get_private_key(author: String, token: String) -> Result<(RsaPrivateKey, String), String> {
     let key_string = aes::decrypt_key(PRIVATE_KEY.to_owned(), USER_PIN.to_owned());
     let key = RsaPrivateKey::from_pkcs8_pem(&key_string).expect("Error while parsing private key");
-    key
+    Ok((key, "new token".to_owned()))
 }
 
 pub fn get_public_key() -> RsaPublicKey {
