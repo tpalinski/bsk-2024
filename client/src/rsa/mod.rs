@@ -6,7 +6,7 @@ mod encryption;
 mod decryption;
 mod cert;
 mod utils;
-mod model;
+pub mod model;
 
 pub async fn sign_data(data: &[u8], author: String, token: String, pin: String) -> Result<(String, String), String> {
     let (key, new_token) = get_private_key(author.clone(), token, pin).await?;

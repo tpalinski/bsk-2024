@@ -8,6 +8,7 @@ pub fn HomePage() -> impl IntoView {
             <h1 class="text-violet-300 text-6xl">"Professional RSA encryption app"</h1>
             <p class="bold text-xl text-center"> Choose one of the options below </p>
             <a href="/signature" class="p-4 bg-violet-300 rounded-xl"> Sign a document utilizing electronic signature </a>
+            <a href="/verify" class="p-4 bg-violet-300 rounded-xl"> Verify a signature </a>
         </div>
     }
 }
