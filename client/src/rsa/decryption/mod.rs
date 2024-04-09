@@ -1,5 +1,6 @@
 use base64ct::{Base64, Encoding};
 use rsa::pkcs1v15::Signature;
+use rsa::{Pkcs1v15Encrypt, RsaPrivateKey};
 use rsa::{pkcs1v15::VerifyingKey, RsaPublicKey};
 use rsa::sha2::Sha256;
 use rsa::signature::Verifier;
@@ -13,4 +14,12 @@ pub fn verify_signature(data: &[u8], key: RsaPublicKey, signature: String) -> Re
     let signature  = Signature::try_from(signature_bytes.as_slice())?;
     let res = ver_key.verify(data, &signature);
     res
+}
+
+pub fn decrypt(data: &[u8], key: RsaPrivateKey) -> Result<Vec<u8>, String> {
+    let plain = key.decrypt(Pkcs1v15Encrypt, data);
+    match plain {
+        Ok(bytes) => Ok(bytes),
+        Err(e) => Err(format!("Error while decrypting file: {e}"))
+    }
 }

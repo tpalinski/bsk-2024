@@ -1,6 +1,8 @@
+use base64ct::{Base64, Encoding};
+
 use crate::keys::{get_private_key, get_public_key};
 
-use self::{encryption::encrypt, model::{Signature, SignatureProps}};
+use self::{decryption::decrypt, encryption::encrypt, model::{Signature, SignatureProps}};
 
 mod encryption;
 mod decryption;
@@ -27,4 +29,12 @@ pub async fn verify_signature(data: &[u8], xades_data: Vec<u8>) -> Result<bool, 
 pub async fn encrypt_data(data: &[u8], user: String) -> Result<String, String> {
     let key = get_public_key(user).await?;
     encrypt(data, key)
+}
+
+pub async fn decrypt_data(data: &[u8], user: String, token: String, pin: String) -> Result<(Vec<u8>, String), String> {
+    let (key, new_token) = get_private_key(user.clone(), token, pin).await?;
+    let stringified = String::from_utf8(data.to_vec()).unwrap();
+    let data = Base64::decode_vec(&stringified).unwrap();
+    let res = decrypt(&data, key)?;
+    Ok((res, new_token))
 }
