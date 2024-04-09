@@ -10,6 +10,7 @@ pub fn HomePage() -> impl IntoView {
             <a href="/signature" class="p-4 bg-violet-300 rounded-xl"> Sign a document utilizing electronic signature </a>
             <a href="/verify" class="p-4 bg-violet-300 rounded-xl"> Verify a signature </a>
             <a href="/encrypt" class="p-4 bg-violet-300 rounded-xl"> Encrypt a file using RSA</a>
+            <a href="/decrypt" class="p-4 bg-violet-300 rounded-xl"> Decrypt a file using RSA</a>
         </div>
     }
 }
