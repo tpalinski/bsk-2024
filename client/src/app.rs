@@ -3,7 +3,7 @@ use leptos_meta::*;
 use leptos_router::*;
 use serde::{Deserialize, Serialize};
 
-use crate::pages::{home::HomePage, login::LoginPage, signature::SignaturePage, verify::VerifyPage};
+use crate::pages::{encrypt::EncryptPage, home::HomePage, login::LoginPage, signature::SignaturePage, verify::VerifyPage};
 
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -33,7 +33,6 @@ pub fn App() -> impl IntoView {
         // sets the document title
         <Title text="RSA encryption"/>
 
-        // content for this welcome page
         <Router>
             <main>
                 <Routes>
@@ -41,6 +40,7 @@ pub fn App() -> impl IntoView {
                     <Route path="/login" view=LoginPage/>
                     <Route path="/signature" view=SignaturePage/>
                     <Route path="/verify" view=VerifyPage/>
+                    <Route path="/encrypt" view=EncryptPage/>
                     <Route path="/*any" view=NotFound/>
                 </Routes>
             </main>
