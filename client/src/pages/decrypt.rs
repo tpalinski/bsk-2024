@@ -3,10 +3,22 @@ use leptos::*;
 use crate::app::GlobalState;
 
 #[server(DecryptFile, "/api")]
-async fn decrypt_file(path: String) -> Result<String, ServerFnError> {
+async fn decrypt_file(path: String, token: String, user: String, pin: String) -> Result<(String, String), ServerFnError> {
     #[cfg(feature="ssr")]
     {
-        todo!()
+        use crate::{filesystem::{get_data_from_fake_path, save_to_fake_path}, rsa::decrypt_data};
+
+        let data = get_data_from_fake_path(path.clone());
+        let (plaintext, new_token) = match decrypt_data(&data, user, token, pin).await {
+            Ok(p) => p,
+            Err(e) => {
+                let resp = expect_context::<leptos_actix::ResponseOptions>();
+                resp.set_status(actix_web::http::StatusCode::BAD_REQUEST);
+                return Err(ServerFnError::ServerError(format!("Error while decrypting data: {e}")))
+            }
+        };
+        save_to_fake_path(plaintext, path, ".plain");
+        Ok((format!("File decrypted successfully"), new_token))
     }
 }
 
@@ -24,6 +36,8 @@ pub fn DecryptPage() -> impl IntoView {
         options.replace = true;
         navigate("/login?redirect=decrypt", options);
     }
+
+    let (pin, set_pin) = create_signal(String::new());
 
     let decrypt_error = Signal::derive(move || {
         let val = decrypt_action.value().get();
@@ -49,6 +63,13 @@ pub fn DecryptPage() -> impl IntoView {
         }
     });
 
+    create_effect(move |_| {
+        let action_data = decrypt_data.get();
+        if action_data.is_some() {
+            let res = action_data.unwrap();
+            set_token(res.1);
+        }
+    });
 
     view! {
         <div class="bg-gray-600 h-screen w-screen flex flex-col gap-4 items-center">
@@ -56,14 +77,23 @@ pub fn DecryptPage() -> impl IntoView {
             <a href="/" class="p-4 bg-violet-300 rounded-xl"> Homepage </a>
             <p class="bold text-xl text-center"> decrypt signature</p>
             <label>
-                "Signature file"
-                <input type="file" accept=".xades"
+                "Encrypted file"
+                <input type="file" accept=".ciphertext"
                     node_ref=input_ref
+                />
+            </label>
+            <label>
+                "Enter your user pin"
+                <input type="password" name="pin" 
+                    on:input=move |ev| {
+                        set_pin(event_target_value(&ev));
+                    }
+                    prop:value=pin
                 />
             </label>
             <button class="p-4 bg-violet-300 rounded-xl" on:click=move |_| {
                 let path = input_ref().expect("should never happen").value();
-                decrypt_action.dispatch(DecryptFile {path});
+                decrypt_action.dispatch(DecryptFile {path, user: global_state.get().email, token: token.get(), pin: pin.get()});
             }>
             decrypt
             </button>
@@ -77,7 +107,7 @@ pub fn DecryptPage() -> impl IntoView {
                 when=move || {decrypt_data.get().is_some()}
                 fallback=|| view! {}
             >
-                    <p class="text-violet-300 text 4-xl"> {decrypt_data.get().unwrap()} </p>
+                    <p class="text-violet-300 text 4-xl"> {decrypt_data.get().unwrap().0} </p>
             </Show>
         </div>
     }
