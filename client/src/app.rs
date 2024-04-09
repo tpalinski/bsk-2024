@@ -3,7 +3,7 @@ use leptos_meta::*;
 use leptos_router::*;
 use serde::{Deserialize, Serialize};
 
-use crate::pages::{encrypt::EncryptPage, home::HomePage, login::LoginPage, signature::SignaturePage, verify::VerifyPage};
+use crate::pages::{decrypt::DecryptPage, encrypt::EncryptPage, home::HomePage, login::LoginPage, signature::SignaturePage, verify::VerifyPage};
 
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -41,6 +41,7 @@ pub fn App() -> impl IntoView {
                     <Route path="/signature" view=SignaturePage/>
                     <Route path="/verify" view=VerifyPage/>
                     <Route path="/encrypt" view=EncryptPage/>
+                    <Route path="/decrypt" view=DecryptPage/>
                     <Route path="/*any" view=NotFound/>
                 </Routes>
             </main>

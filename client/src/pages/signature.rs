@@ -36,7 +36,7 @@ pub fn SignaturePage() -> impl IntoView {
         let navigate = leptos_router::use_navigate();
         let mut options = leptos_router::NavigateOptions::default();
         options.replace = true;
-        navigate("/login", options);
+        navigate("/login?redirect=signature", options);
     }
 
     let (pin, set_pin) = create_signal(String::new());

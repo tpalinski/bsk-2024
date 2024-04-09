@@ -1,5 +1,5 @@
 use leptos::{leptos_dom::logging::console_log, *};
-use leptos_router::NavigateOptions;
+use leptos_router::{use_query_map, NavigateOptions};
 
 use crate::{app::GlobalState, http_client::login, model::LoginResponse};
 
@@ -28,6 +28,9 @@ pub fn LoginPage() -> impl IntoView {
         login_action.dispatch(ServerLogin{email: email.get(), password: password.get()});
     };
 
+    let query = use_query_map();
+    let navigate = leptos_router::use_navigate();
+
     create_effect(move |_| {
         let action_data = login_action.value().get();
         if action_data.is_some() {
@@ -35,10 +38,10 @@ pub fn LoginPage() -> impl IntoView {
                 Ok(res) => {
                     let state = expect_context::<RwSignal<GlobalState>>();
                     state.set(GlobalState{email: res.email, token: res.token, name: res.name});
-                    let navigate = leptos_router::use_navigate();
                     let mut options = NavigateOptions::default();
-                    options.replace = true;
-                    navigate("/signature", options);
+                    options.replace = true; // Remove from nav history
+                    let destination = query.get().get("redirect").unwrap_or(&String::new()).clone();
+                    navigate(&format!("/{destination}"), options);
                 },
                 Err(e) => {
                     console_log(&e.to_string())
