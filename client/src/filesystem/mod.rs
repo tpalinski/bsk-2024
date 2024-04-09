@@ -16,8 +16,8 @@ fn convert_to_home(fake_path: String) -> PathBuf {
     path
 }
 
-fn convert_to_sig_path(fake_path: String) -> PathBuf {
-    let file_name = fake_path.rsplit('\\').collect::<Vec<&str>>()[0].to_owned() + ".xades";
+fn convert_to_sig_path(fake_path: String, suffix: &str) -> PathBuf {
+    let file_name = fake_path.rsplit('\\').collect::<Vec<&str>>()[0].to_owned() + suffix;
     let mut path = dirs::home_dir().unwrap();
     path.push(&file_name);
     path
@@ -36,8 +36,8 @@ pub fn get_data_from_fake_path(fake_path: String) -> Vec<u8> {
     data
 }
 
-pub fn save_to_fake_path(data: Vec<u8>, fake_path: String) {
-    let sig_path = convert_to_sig_path(fake_path);
+pub fn save_to_fake_path(data: Vec<u8>, fake_path: String, suffix: &str) {
+    let sig_path = convert_to_sig_path(fake_path, suffix);
     save_to_file(data, sig_path);
 }
 

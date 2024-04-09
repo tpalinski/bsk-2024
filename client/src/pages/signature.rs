@@ -19,7 +19,7 @@ async fn sign_file(path: String, token: String, name: String, pin: String) -> Re
                 return Err(ServerFnError::ServerError(e))
             }
         };
-        save_to_fake_path(signature.into_bytes(), path);
+        save_to_fake_path(signature.into_bytes(), path, ".xades");
         Ok(new_token)
     }
 }
@@ -34,7 +34,9 @@ pub fn SignaturePage() -> impl IntoView {
 
     if token.get().is_empty() {
         let navigate = leptos_router::use_navigate();
-        navigate("/login", Default::default());
+        let mut options = leptos_router::NavigateOptions::default();
+        options.replace = true;
+        navigate("/login", options);
     }
 
     let (pin, set_pin) = create_signal(String::new());

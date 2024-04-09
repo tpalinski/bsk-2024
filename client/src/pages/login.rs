@@ -1,4 +1,5 @@
 use leptos::{leptos_dom::logging::console_log, *};
+use leptos_router::NavigateOptions;
 
 use crate::{app::GlobalState, http_client::login, model::LoginResponse};
 
@@ -35,7 +36,9 @@ pub fn LoginPage() -> impl IntoView {
                     let state = expect_context::<RwSignal<GlobalState>>();
                     state.set(GlobalState{email: res.email, token: res.token, name: res.name});
                     let navigate = leptos_router::use_navigate();
-                    navigate("/signature", Default::default());
+                    let mut options = NavigateOptions::default();
+                    options.replace = true;
+                    navigate("/signature", options);
                 },
                 Err(e) => {
                     console_log(&e.to_string())
