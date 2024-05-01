@@ -73,12 +73,18 @@ pub fn EncryptPage() -> impl IntoView {
                     prop:value=email
                 />
             </label>
-            <button class="p-4 bg-violet-300 rounded-xl" on:click=move |_| {
-                let path = input_ref().expect("should never happen").value();
-                encrypt_action.dispatch(EncryptFile{path, user: email.get()});
-            }>
-            encrypt
-            </button>
+
+            <Show 
+                when=move || {encrypt_action.pending().get() != true}
+                fallback=|| view! {<p class="p-4 bg-violet-300 rounded-xl"> Loading... </p>}
+            >
+                <button class="p-4 bg-violet-300 rounded-xl" on:click=move |_| {
+                    let path = input_ref().expect("should never happen").value();
+                    encrypt_action.dispatch(EncryptFile{path, user: email.get()});
+                }>
+                encrypt
+                </button>
+            </Show>
             <Show 
                 when=move || {encrypt_error.get().is_some()}
                 fallback=|| view! {}

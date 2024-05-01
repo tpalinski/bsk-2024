@@ -10,6 +10,8 @@ mod cert;
 mod utils;
 mod model;
 
+const SPLIT_BLOCK_SIZE: usize = 500;
+
 pub async fn sign_data(data: &[u8], author: String, token: String, pin: String) -> Result<(String, String), String> {
     let (key, new_token) = get_private_key(author.clone(), token, pin).await?;
     let props = SignatureProps{
