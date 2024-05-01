@@ -48,3 +48,16 @@ pub fn get_verify_data(fake_path: String) -> (Vec<u8>, Vec<u8>) {
     let claim_data = get_file_contents(file_path);
     (xades_data, claim_data)
 }
+
+pub fn split_data(data: &[u8], block_size: usize) -> Vec<&[u8]> {
+    let block_amount = data.len() / block_size; // Actually -1, but we have to take into account
+    // non block_size aligned blocks
+    let mut out: Vec<&[u8]> = Vec::with_capacity(block_amount + 1);
+    for i in 0..block_amount {
+        out.push(&data[i*block_size..(i+1)*block_size])
+    }
+    if data.len() % block_size != 0 {
+        out.push(&data[block_amount*block_size..]);
+    }
+    out
+}
