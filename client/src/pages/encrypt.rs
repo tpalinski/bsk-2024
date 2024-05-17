@@ -1,3 +1,5 @@
+use std::time::Instant;
+
 use leptos::*;
 
 #[server(EncryptFile, "/api")]
@@ -8,6 +10,9 @@ async fn encrypt_file(path: String, user: String) -> Result<String, ServerFnErro
 
         // load files
         let data = get_data_from_fake_path(path.clone());
+        println!("Encrypting RSA file, size: ");
+        dbg!(&data.len());
+        let start = Instant::now();
         let ciphertext = match encrypt_data(&data, user.clone()).await {
             Ok(res) => res,
             Err(e) => {
@@ -17,6 +22,8 @@ async fn encrypt_file(path: String, user: String) -> Result<String, ServerFnErro
             }
         };
         save_to_fake_path(ciphertext.into_bytes(), path, ".ciphertext");
+        let elapsed = Instant::now() - start;
+        println!("Done in {:?}", elapsed);
         Ok(format!("File encrypted successfully. You can now send it to {user}"))
 
     }

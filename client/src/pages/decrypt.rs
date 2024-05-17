@@ -1,3 +1,5 @@
+use std::time::Instant;
+
 use leptos::*;
 
 use crate::app::GlobalState;
@@ -9,6 +11,9 @@ async fn decrypt_file(path: String, token: String, user: String, pin: String) ->
         use crate::{filesystem::{get_data_from_fake_path, save_to_fake_path}, rsa::decrypt_data};
 
         let data = get_data_from_fake_path(path.clone());
+        println!("Encrypting RSA file, size: ");
+        dbg!(&data.len());
+        let start = Instant::now();
         let (plaintext, new_token) = match decrypt_data(&data, user, token, pin).await {
             Ok(p) => p,
             Err(e) => {
@@ -18,6 +23,8 @@ async fn decrypt_file(path: String, token: String, user: String, pin: String) ->
             }
         };
         save_to_fake_path(plaintext, path, ".plain");
+        let elapsed = Instant::now() - start;
+        println!("Done in {:?}", elapsed);
         Ok((format!("File decrypted successfully"), new_token))
     }
 }
